@@ -1,5 +1,6 @@
-var wallpapers = angular.module('xivinsight.core', [
+angular.module('xivinsight.core', [
     'xivinsight.services.SiteConfiguration',
+    'xivinsight.filters',
     'xivinsight.api'
 ])
 
@@ -134,6 +135,19 @@ var wallpapers = angular.module('xivinsight.core', [
         templateUrl: SiteConfiguration.TEMPLATE_URL + 'swing/list_item.html',
         scope: {
             "swing": '='
+        }
+    }
+})
+.directive('swingIcon', function(SiteConfiguration){
+    function getAttackImageName(attacktype){
+        var name = attacktype.toLowerCase().replace(" (*)", "_tick").replace(" ", '_');
+        return SiteConfiguration.IMAGE_URL + name + ".png";
+    }
+
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs, controller){
+            attrs.$set('src', getAttackImageName(scope.swing.attacktype));
         }
     }
 })

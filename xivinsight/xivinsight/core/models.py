@@ -1,10 +1,8 @@
 from django.db import models
 
-class AttackType(models.Model):
-    class Meta:
-        managed = False
-        db_table = 'attacktype_table'
+from . import utils
 
+class AttackType(models.Model):
     encid = models.CharField("ID", max_length=8, primary_key=True)
     attacker = models.CharField("Attacker", max_length=6, null=True, blank=True)
     victim = models.CharField("Victim", max_length=6, null=True, blank=True)
@@ -37,15 +35,15 @@ class AttackType(models.Model):
     dmgreduced = models.IntegerField("Damaged reduced", null=True, blank=True)
     overheal = models.IntegerField("Overheal", null=True, blank=True)
 
+    class Meta:
+        managed = False
+        db_table = 'attacktype_table'
+
     def __str__(self):
         return "{type}".format(**self.__dict__)
 
 
 class Combatant(models.Model):
-    class Meta:
-        managed = False
-        db_table = 'combatant_table'
-
     encid = models.CharField(max_length=8, primary_key=True)
     ally = models.CharField(max_length=1, null=True, blank=True)
     name = models.CharField(max_length=64, null=True, blank=True)
@@ -84,12 +82,12 @@ class Combatant(models.Model):
     inctohit = models.CharField(max_length=8, null=True, blank=True)
     overhealpct = models.CharField(max_length=8, null=True, blank=True)
 
-
-class Current(models.Model):
     class Meta:
         managed = False
-        db_table = 'current_table'
+        db_table = 'combatant_table'
 
+
+class Current(models.Model):
     encid = models.CharField(max_length=8, primary_key=True)
     ally = models.CharField(max_length=1, null=True, blank=True)
     name = models.CharField(max_length=64, null=True, blank=True)
@@ -128,11 +126,12 @@ class Current(models.Model):
     inctohit = models.CharField(max_length=8, null=True, blank=True)
     overhealpct = models.IntegerField(null=True, blank=True)
 
-class DamageType(models.Model):
     class Meta:
         managed = False
-        db_table = 'damagetype_table'
+        db_table = 'current_table'
 
+
+class DamageType(models.Model):
     encid = models.CharField(max_length=8, primary_key=True)
     combatant = models.CharField(max_length=64, null=True, blank=True)
     grouping = models.CharField(max_length=92, null=True, blank=True)
@@ -160,36 +159,36 @@ class DamageType(models.Model):
     blockpct = models.CharField(max_length=8, null=True, blank=True)
     overheal = models.IntegerField(null=True, blank=True)
 
-
-class Encounter(models.Model):
     class Meta:
         managed = False
-        db_table = 'encounter_table'
+        db_table = 'damagetype_table'
 
+
+class Encounter(models.Model):
     encid = models.CharField(max_length=8, primary_key=True)
     title = models.CharField(max_length=64, null=True, blank=True)
     starttime = models.DateTimeField()
     endtime = models.DateTimeField(null=True, blank=True)
     duration = models.IntegerField(null=True, blank=True)
     damage = models.IntegerField(null=True, blank=True)
-    encdps = models.FloatField(null=True, blank=True)
+    encdps = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     zone = models.CharField(max_length=64, null=True, blank=True)
     kills = models.IntegerField(null=True, blank=True)
     deaths = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'encounter_table'
 
     def __str__(self):
         return "{encid} - {title}".format(**self.__dict__)
 
 
 class Swing(models.Model):
-    class Meta:
-        managed = False
-        db_table = 'swing_table'
-
     encid = models.CharField(max_length=8, primary_key=True)
     stime = models.DateTimeField()
     attacker = models.CharField(max_length=64, null=True, blank=True)
-    swingtype = models.IntegerField(null=True, blank=True)
+    swingtype = models.IntegerField(choices=utils.SWING_TYPES_CHOICES, null=True, blank=True)
     attacktype = models.CharField(max_length=64, null=True, blank=True)
     damagetype = models.CharField(max_length=64, null=True, blank=True)
     victim = models.CharField(max_length=64, null=True, blank=True)
@@ -200,3 +199,20 @@ class Swing(models.Model):
     dmgadjust = models.CharField(max_length=8, null=True, blank=True)
     dmgreduced = models.IntegerField(null=True, blank=True)
     overheal = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'swing_table'
+        ordering = ('stime',)
+
+    def is_dot(self):
+        return self.attack_type == utils.ATTACK_TYPE['DOT_TICK']
+
+    def get_real_attacktype(self):
+        return self.attacktype.replace(" (*)", "")
+
+    def is_instant(self):
+        return None
+
+    def is_critical_hit(self):
+        return self.critical == "T"

@@ -1,4 +1,14 @@
-<div class="swing">
-    <strong>{{ swing.attacker }}</strong> <em>{{ swing.attacktype }}</em>:
-    {{ swing.damagestring }}
+<div class="swing row" ng-class="{critical: swing.critical == 'T'}">
+    <div class="col-md-1">
+        <img swing-icon class="icon" />
+    </div>
+    <div class="col-md-1">
+        <strong>{{ swing.attacker }}</strong>
+    </div>
+    <div class="col-md-2">
+        <em>{{ swing.attacktype }}</em>
+    </div>
+    <div class="col-md-1">
+        <span class="damage">{{ swing.damagestring }}</span>
+    </div>
 </div>
