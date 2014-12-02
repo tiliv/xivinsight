@@ -1,0 +1,6 @@
+.encounter-item img.target {
+    width: 1.5em;
+    height: 1.5em;
+    border: 1px solid #555;
+    border-radius: 3px;
+}

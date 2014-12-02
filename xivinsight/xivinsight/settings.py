@@ -63,6 +63,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'act',
+        'HOST': '10.0.0.14',
         'USER': 'root',
         'PASSWORD': '',
     }

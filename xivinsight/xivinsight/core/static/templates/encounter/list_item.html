@@ -1,0 +1,9 @@
+<a class="encounter-item list-group-item" href="#"
+        ng-class="{'active': $root.session.data.encounter == encounter}"
+        ng-click="activate()">
+    <img class="target" src="http://xivdbimg.zamimg.com/images/icons/053000/053041.png" />
+    <strong>{{ encounter.title }}</strong>
+    <p>
+        <em>{{ encounter.encid }}</em>
+    </p>
+</div>
