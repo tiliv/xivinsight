@@ -1,6 +1,14 @@
-<div class="swing row" ng-class="{critical: swing.critical == 'T'}">
+<div class="swing row" ng-class="{
+        critical: swing.is_critical_hit,
+        gcd: swing.is_ability && swing.is_gcd_ability,
+        ability: swing.is_ability,
+        tick: swing.is_dot_tick
+    }">
     <div class="col-md-1">
         <img swing-icon class="icon" />
+    </div>
+    <div class="col-md-1">
+        <em>{{ swing.stime_delta }}</em>
     </div>
     <div class="col-md-1">
         <strong>{{ swing.attacker }}</strong>

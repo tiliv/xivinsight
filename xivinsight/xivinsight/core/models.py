@@ -1,6 +1,6 @@
 from django.db import models
 
-from . import utils
+from . import managers, utils
 
 class AttackType(models.Model):
     encid = models.CharField("ID", max_length=8, primary_key=True)
@@ -185,6 +185,8 @@ class Encounter(models.Model):
 
 
 class Swing(models.Model):
+    objects = managers.SwingQuerySet.as_manager()
+
     encid = models.CharField(max_length=8, primary_key=True)
     stime = models.DateTimeField()
     attacker = models.CharField(max_length=64, null=True, blank=True)
@@ -200,19 +202,31 @@ class Swing(models.Model):
     dmgreduced = models.IntegerField(null=True, blank=True)
     overheal = models.IntegerField(null=True, blank=True)
 
+    # def get_stime_delta(self):
+    #     return getattr(self, '_stime_delta', "wut")
+
     class Meta:
         managed = False
         db_table = 'swing_table'
         ordering = ('stime',)
 
-    def is_dot(self):
-        return self.attack_type == utils.ATTACK_TYPE['DOT_TICK']
+    # def get_stime_delta(self):
+    #     return getattr(self, '')
 
     def get_real_attacktype(self):
         return self.attacktype.replace(" (*)", "")
 
-    def is_instant(self):
-        return None
+    def is_dot_tick(self):
+        return self.swingtype == utils.SWING_TYPES['DOT_TICK']
+
+    def is_ability(self):
+        return self.swingtype == utils.SWING_TYPES['SKILL']
+
+    def is_gcd_ability(self):
+        # FIXME: Can't tell abilities apart yet
+        if self.is_dot_tick():
+            return False
+        return True
 
     def is_critical_hit(self):
         return self.critical == "T"

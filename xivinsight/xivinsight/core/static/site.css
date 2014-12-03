@@ -19,3 +19,7 @@
     width: 25px;
     height: 25px;
 }
+
+.swing:not(.gcd) {
+    transform: scale(0.95);
+}

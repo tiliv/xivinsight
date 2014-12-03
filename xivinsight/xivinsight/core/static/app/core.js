@@ -25,40 +25,51 @@ angular.module('xivinsight.core', [
 })
 
 // <encounter-list>
-.controller('EncounterList', function($scope, Restangular){
+.controller('EncounterList', function($scope, Restangular, Session){
     var apiSource = Restangular.all('encounter').getList();
     $scope.objects = apiSource.$object;  // to be filled when api call finishes
+
+    this.activateEncounter = function(encounter){
+        Session.setEncounter(encounter);
+    }
+    this.deleteEncounter = function(encounter){
+        Restangular.one('encounter', encounter.encid).remove();
+    }
 })
 .directive('encounterList', function(SiteConfiguration){
     return {
         restrict: 'E',
+        controller: 'EncounterList',
         templateUrl: SiteConfiguration.TEMPLATE_URL + 'encounter/list.html'
     }
 })
 
 // <encounter-item>
-.controller('EncounterItem', function(Session){
-    this.activateEncounter = function(encounter){
-        Session.setEncounter(encounter);
-    }
+.controller('EncounterItem', function(){
 })
 .directive('encounterItem', function(SiteConfiguration){
     return {
         restrict: 'EA',
         controller: 'EncounterItem',
+        require: '^encounterList',
         replace: true,  // the bootstrap a.list-group-item is hard :'(
         templateUrl: SiteConfiguration.TEMPLATE_URL + 'encounter/list_item.html',
         scope: {
             "encounter": '=',
-            "itemController": '='
         },
-        link: function(scope, element, attrs, controller){
-            function activate(){
-                controller.activateEncounter(scope.encounter);
+        link: function(scope, element, attrs, listController){
+            console.log(listController);
+            var fn = {
+                activate: function(){
+                    listController.activateEncounter(scope.encounter);
+                },
+                delete: function(){
+                    listController.deleteEncounter(scope.encounter);
+                }
             }
 
             // Publish to scope
-            scope.activate = activate;
+            angular.extend(scope, fn);
         }
     }
 })
@@ -71,11 +82,11 @@ angular.module('xivinsight.core', [
         'allSwings': []
     };
     function _getApiSource(){
-        apiSource = Restangular.all('swing').getList({
-            encid: Session.data.encounter.encid,
-        });
-        // TODO: Split all of these into their viewable categories
-        data.allSwings = apiSource.$object;
+        var swingsDirectory = Restangular.one('encounter', Session.data.encounter.encid);
+        apiSource = swingsDirectory.one('gcd').get();
+
+        data.swings = {};
+        data.swings.gcd = apiSource.$object;
     }
 
     this.clearEncounter = function(){
@@ -120,7 +131,9 @@ angular.module('xivinsight.core', [
         restrict: 'E',
         controller: 'SwingList',
         templateUrl: SiteConfiguration.TEMPLATE_URL + 'swing/list.html',
-        scope: true
+        scope: {
+            "objects": '=swings'
+        }
     }
 })
 
@@ -140,7 +153,7 @@ angular.module('xivinsight.core', [
 })
 .directive('swingIcon', function(SiteConfiguration){
     function getAttackImageName(attacktype){
-        var name = attacktype.toLowerCase().replace(" (*)", "_tick").replace(" ", '_');
+        var name = attacktype.toLowerCase().replace(" (*)", "_tick").replace(/ /g, '_');
         return SiteConfiguration.IMAGE_URL + name + ".png";
     }
 
