@@ -1,0 +1,15 @@
+<div class="combatant panel" ng-class="{
+        'panel-info': combatant.ally && combatant.name != 'YOU',
+        'panel-primary': combatant.ally && combatant.name == 'YOU',
+        'panel-danger': !combatant.ally
+    }">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <code>{{ combatant.job }}</code>
+            {{ combatant.name }}
+        </h3>
+    </div>
+    <div class="panel-body">
+        stuff
+    </div>
+</div>

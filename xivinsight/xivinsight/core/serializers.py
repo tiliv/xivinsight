@@ -34,11 +34,15 @@ class TimedeltaField(Field):
             raise ValidationError(msg)
 
 
+
+
 class AttackTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.AttackType
 
 class CombatantSerializer(serializers.ModelSerializer):
+    ally = serializers.BooleanField(source='is_ally')
+
     class Meta:
         model = models.Combatant
 
@@ -49,10 +53,6 @@ class CurrentSerializer(serializers.ModelSerializer):
 class DamageTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.DamageType
-
-class EncounterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Encounter
 
 class SwingListSerializer(serializers.ListSerializer):
     @property
@@ -73,9 +73,10 @@ class SwingListSerializer(serializers.ListSerializer):
 
     def get_statistical_values(self, objects):
         deltas = numpy.array(tuple(map(itemgetter('stime_delta'), objects)))
-        median = numpy.median(deltas)
-        if median == numpy.nan:
-            median = 0
+        # median = numpy.median(deltas)
+        # if median == numpy.nan:
+        #     median = 0
+        median = 0
         return {
             'median_stime_delta': median,
         }
@@ -94,3 +95,17 @@ class SwingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Swing
         list_serializer_class = SwingListSerializer
+
+
+class EncounterSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Encounter
+
+
+class EncounterSerializer(serializers.ModelSerializer):
+    combatants = CombatantSerializer(source='get_combatants', many=True, read_only=True)
+    # swings =
+
+    class Meta:
+        model = models.Encounter
+

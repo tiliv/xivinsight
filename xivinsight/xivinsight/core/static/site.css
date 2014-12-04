@@ -23,3 +23,16 @@
 .swing:not(.gcd) {
     transform: scale(0.95);
 }
+
+.background-text {
+    position: absolute;
+    right: 0;
+    font-size: 4em;
+    font-style: italic;
+    opacity: 0.1;
+}
+
+.up5 {
+    position: relative;
+    z-index: 5;
+}

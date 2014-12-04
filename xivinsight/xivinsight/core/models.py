@@ -86,6 +86,12 @@ class Combatant(models.Model):
         managed = False
         db_table = 'combatant_table'
 
+    def get_encounter(self):
+        return Encounter.objects.get(encid=self.encid)
+
+    def is_ally(self):
+        return self.ally == "T"
+
 
 class Current(models.Model):
     encid = models.CharField(max_length=8, primary_key=True)
@@ -182,6 +188,9 @@ class Encounter(models.Model):
 
     def __str__(self):
         return "{encid} - {title}".format(**self.__dict__)
+
+    def get_combatants(self):
+        return Combatant.objects.filter(encid=self.encid)
 
 
 class Swing(models.Model):

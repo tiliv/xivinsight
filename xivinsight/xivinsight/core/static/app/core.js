@@ -100,11 +100,12 @@ angular.module('xivinsight.core', [
         'allSwings': []
     };
     function _getApiSource(){
-        var swingsDirectory = Restangular.one('encounter', Session.data.encounter.encid);
-        apiSource = swingsDirectory.one('gcd').get();
+        apiSource = Restangular.all('combatant').getList({
+            'encid': Session.data.encounter.encid
+        });
 
-        data.swings = {};
-        data.swings.gcd = apiSource.$object;
+        data = {};
+        data.combatants = apiSource.$object;
     }
 
     this.clearEncounter = function(){
@@ -166,6 +167,49 @@ angular.module('xivinsight.core', [
         templateUrl: SiteConfiguration.TEMPLATE_URL + 'swing/list_item.html',
         scope: {
             "swing": '='
+        }
+    }
+})
+.directive('swingIcon', function(SiteConfiguration){
+    function getAttackImageName(attacktype){
+        var name = attacktype.toLowerCase().replace(" (*)", "_tick").replace(/ /g, '_');
+        return SiteConfiguration.IMAGE_URL + name + ".png";
+    }
+
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs, controller){
+            attrs.$set('src', getAttackImageName(scope.swing.attacktype));
+        }
+    }
+})
+
+// <swing-list>
+.controller('CombatantList', function($scope){
+    
+})
+.directive('combatantList', function(SiteConfiguration){
+    return {
+        restrict: 'E',
+        controller: 'SwingList',
+        templateUrl: SiteConfiguration.TEMPLATE_URL + 'combatant/list.html',
+        scope: {
+            "objects": '=combatants'
+        }
+    }
+})
+
+// <swing-item>
+.controller('Combatant', function(){
+    
+})
+.directive('combatant', function(SiteConfiguration){
+    return {
+        restrict: 'E',
+        controller: 'SwingItem',
+        templateUrl: SiteConfiguration.TEMPLATE_URL + 'combatant/list_item.html',
+        scope: {
+            "combatant": '='
         }
     }
 })
