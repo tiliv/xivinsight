@@ -73,10 +73,8 @@ class SwingListSerializer(serializers.ListSerializer):
 
     def get_statistical_values(self, objects):
         deltas = numpy.array(tuple(map(itemgetter('stime_delta'), objects)))
-        median = numpy.median(deltas)
         return {
-            'repr': repr(median),
-            'median_stime_delta': median,
+            'median_stime_delta': median if not median == numpy.nan else None,
         }
 
 class SwingSerializer(serializers.ModelSerializer):
