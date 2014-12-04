@@ -16,7 +16,7 @@ router.register(r'swing', api.SwingViewSet)
 # The API URLs are now determined automatically by the router.
 # Additionally, we include the login URLs for the browseable API.
 urlpatterns = [
-    url(r'^$', views.Site.as_view()),
+    url(r'^$', views.site),
     url(r'^api/act/', include(router.urls)),
     # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

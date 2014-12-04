@@ -1,4 +1,7 @@
-from django.views.generic import TemplateView
+from django.views.decorators.csrf import requires_csrf_token
+from django.shortcuts import render
 
-class Site(TemplateView):
-    template_name = "site.html"
+@requires_csrf_token
+def site(request):
+    return render(request, "site.html", {})
+

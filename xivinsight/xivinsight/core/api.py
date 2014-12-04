@@ -62,3 +62,6 @@ class EncounterViewSet(FieldFilterMixin, viewsets.ModelViewSet):
 class SwingViewSet(FieldFilterMixin, viewsets.ModelViewSet):
     queryset = models.Swing.objects.all()
     serializer_class = serializers.SwingSerializer
+
+    def destroy(self, request, pk=None):
+        print('--- destroy requested pk=', pk)

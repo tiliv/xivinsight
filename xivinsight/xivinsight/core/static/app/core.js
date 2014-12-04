@@ -1,10 +1,19 @@
 angular.module('xivinsight.core', [
+    'ngCookies',
     'xivinsight.services.SiteConfiguration',
     'xivinsight.filters',
     'xivinsight.api'
 ])
 
-.factory('Session', function($rootScope){
+.run(function($http, $cookies){
+    var csrf_header = {'X-CSRFToken': $cookies.csrftoken}
+    $http.defaults.headers['delete'] = {};
+    angular.extend($http.defaults.headers.post, csrf_header);
+    angular.extend($http.defaults.headers.put, csrf_header);
+    angular.extend($http.defaults.headers.delete, csrf_header);
+})
+
+.factory('Session', function(){
     var data = {
         'encounter': null
     };
@@ -26,15 +35,25 @@ angular.module('xivinsight.core', [
 
 // <encounter-list>
 .controller('EncounterList', function($scope, Restangular, Session){
-    var apiSource = Restangular.all('encounter').getList();
-    $scope.objects = apiSource.$object;  // to be filled when api call finishes
+    var apiSource = null;
+    function _getApiSource(){
+        apiSource = Restangular.all('encounter').getList();
+        $scope.objects = apiSource.$object;  // to be filled when api call finishes
+    }
 
     this.activateEncounter = function(encounter){
         Session.setEncounter(encounter);
     }
     this.deleteEncounter = function(encounter){
         Restangular.one('encounter', encounter.encid).remove();
+        if (Session.data.encounter == encounter) {
+            Session.setEncounter(null);
+        }
+        var i = $scope.objects.indexOf(encounter);
+        $scope.objects.splice(i, 1);
     }
+
+    _getApiSource();
 })
 .directive('encounterList', function(SiteConfiguration){
     return {
@@ -58,7 +77,6 @@ angular.module('xivinsight.core', [
             "encounter": '=',
         },
         link: function(scope, element, attrs, listController){
-            console.log(listController);
             var fn = {
                 activate: function(){
                     listController.activateEncounter(scope.encounter);
